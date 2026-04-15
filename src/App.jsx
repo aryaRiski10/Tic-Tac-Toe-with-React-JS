@@ -29,44 +29,57 @@ function calculateWinner(squares) {
 }
 
 export default function App() {
-  const [squares, setSquares] = useState(Array(9).fill(null))
+  const [history, setHistory] = useState([{ squares: Array(9).fill(null), player: null, squareIndex: null }])
   const [xIsNext, setXIsNext] = useState(true)
 
-  function handleClick(i) {
-    if (squares[i] || calculateWinner(squares)) return
+  const currentSquares = history[history.length - 1].squares
 
-    const nextSquares = squares.slice()
-    console.log(nextSquares)
-    nextSquares[i] = xIsNext ? 'X' : 'O'
+  function handleClick(i) {
+    if (currentSquares[i] || calculateWinner(currentSquares)) return
+
+    const nextSquares = currentSquares.slice()
+    const player = xIsNext ? 'X' : 'O'
+    nextSquares[i] = player
     setXIsNext(!xIsNext)
-    setSquares(nextSquares)
+    setHistory([...history, { squares: nextSquares, player, squareIndex: i }])
   }
 
-  const winner = calculateWinner(squares);
-  let status = '';
+  function resetGame() {
+    setHistory([{ squares: Array(9).fill(null), player: null, squareIndex: null }])
+    setXIsNext(true)
+  }
+
+  const winner = calculateWinner(currentSquares)
+  let status = ''
   if (winner) {
     status = `The winner is ${winner}`
-  } else if (!squares.includes(null)) {
+  } else if (!currentSquares.includes(null)) {
     status = `It's a draw!`
   } else {
     status = `Next player is ${xIsNext ? 'X' : 'O'}`
   }
+
+  const moves = history.slice(1).map((step, move) => (
+    <li key={move}>
+      {`Move ${move + 1}: Player ${step.player} on square ${step.squareIndex + 1}`}
+    </li>
+  ))
 
   return (
     <div className="game">
       <div className='game-board'>
         <div className="statusWinner">{status}</div>
         <div className="board">
-          <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
-          <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
-          <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
-          <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
-          <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
-          <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
-          <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
-          <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
-          <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
+          {currentSquares.map((square, i) => {
+            return <Square key={i} value={currentSquares[i]} onSquareClick={() => handleClick(i)} />
+          })}
         </div>
+        <button className='reset-btn' onClick={resetGame}>Reset Game</button>
+      </div>
+
+      <div className='game-info'>
+        <h3 style={{ margin: 0 }}>Moveset</h3>
+        <ol>{moves}</ol>
       </div>
     </div>
   )
