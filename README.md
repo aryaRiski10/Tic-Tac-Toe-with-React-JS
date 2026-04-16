@@ -1,4 +1,4 @@
-# Preview : https://aryariski10.github.io/Tic-Tac-Toe-with-React-JS/
+## Preview : https://aryariski10.github.io/Tic-Tac-Toe-with-React-JS/
 
 # React + Vite
 
